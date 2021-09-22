@@ -4,14 +4,17 @@
   "description": "tdd with express",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app",
+    "start": "nodemon index",
     "test": "jest --watch",
     "lint": "eslint ."
   },
   "author": "Harriton",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "bcrypt": "^5.0.1",
+    "express": "^4.17.1",
+    "sequelize": "^6.6.5",
+    "sqlite3": "^5.0.2"
   },
   "devDependencies": {
     "eslint": "^7.32.0",
@@ -24,7 +27,7 @@
   },
   "eslintConfig": {
     "parserOptions": {
-      "ecmaVersion": 6
+      "ecmaVersion": 2018
     },
     "extends": [
       "eslint:recommended",
