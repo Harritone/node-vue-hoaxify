@@ -7,4 +7,12 @@ const save = async (body) => {
   // const user = Object.assign({}, req.body, { password: hash });
   await User.create(user);
 };
-module.exports = { save };
+
+const findByEmail = async (email) => {
+  const user = await User.findOne({ where: { email: email } });
+  if (user) {
+    throw new Error('has already been taken');
+  }
+};
+
+module.exports = { save, findByEmail };
