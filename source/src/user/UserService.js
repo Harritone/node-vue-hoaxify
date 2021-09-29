@@ -11,7 +11,7 @@ const save = async (body) => {
 const findByEmail = async (email) => {
   const user = await User.findOne({ where: { email: email } });
   if (user) {
-    throw new Error('has already been taken');
+    throw new Error('been_taken');
   }
 };
 

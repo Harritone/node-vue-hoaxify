@@ -17,29 +17,33 @@ const validUser = {
   password: 'P4ssword',
 };
 
-const postUser = (user) => {
-  return request(app).post('/api/v1/users').send(user);
+const postUser = (user = validUser, options = {}) => {
+  const agent = request(app).post('/api/v1/users');
+  if (options.language) {
+    agent.set('Accept-Language', options.language);
+  }
+  return agent.send(user);
 };
 
 describe('User Registration', () => {
   it('returns 200 OK when signup is valid', async () => {
-    const response = await postUser(validUser);
+    const response = await postUser();
     expect(response.status).toBe(200);
   });
 
   it('returns success message when signup is valid', async () => {
-    const response = await postUser(validUser);
+    const response = await postUser();
     expect(response.body.message).toBe('User created');
   });
 
   it('saves user to database', async () => {
-    await postUser(validUser);
+    await postUser();
     const userList = await User.findAll();
     expect(userList.length).toBe(1);
   });
 
   it('saves the username and email to database', async () => {
-    await postUser(validUser);
+    await postUser();
     const userList = await User.findAll();
     const savedUser = userList[0];
     expect(savedUser.username).toBe('user1');
@@ -47,7 +51,7 @@ describe('User Registration', () => {
   });
 
   it('hashes the password in database', async () => {
-    await postUser(validUser);
+    await postUser();
     const userList = await User.findAll();
     const savedUser = userList[0];
     expect(savedUser.password).not.toBe('P4ssword');
@@ -157,9 +161,7 @@ describe('Internationalization', () => {
   const password_size = 'должен быть минимум 4 знака';
   const password_chars = 'должен содержать 1 заглавную 1 рописную буквы и 1 цифру';
   const been_taken = 'уже занят';
-  const postUser = (user) => {
-    return request(app).post('/api/v1/users').set('Accept-Language', 'ru').send(user);
-  };
+  const user_create_success = 'Пользователь создан';
 
   it.each`
     field         | value              | message
@@ -184,24 +186,26 @@ describe('Internationalization', () => {
       password: 'P4ssword',
     };
     user[field] = value;
-    const { body } = await postUser(user);
+    const { body } = await postUser(user, { language: 'ru' });
     expect(body.validationErrors[field]).toBe(message);
   });
 
   it(`returns email ${been_taken} when the same email already taken when language is Russian`, async () => {
     await User.create({ ...validUser });
-    const { body } = await postUser(validUser);
+    const { body } = await postUser({ ...validUser }, { language: 'ru' });
     expect(body.validationErrors.email).toBe(been_taken);
   });
 
   it(`returns errors for both username ${blank} and email ${been_taken}`, async () => {
     await User.create({ ...validUser });
-    const { body } = await postUser({
-      username: null,
-      email: validUser.email,
-      password: 'P4ssword',
-    });
-
+    const { body } = await postUser({ ...validUser, username: null }, { language: 'ru' });
     expect(Object.keys(body.validationErrors)).toEqual(['username', 'email']);
+  });
+
+  it(`returns success message of ${user_create_success} when signup request is valid and language is Russian`, async () => {
+    const {
+      body: { message },
+    } = await postUser(validUser, { language: 'ru' });
+    expect(message).toBe(user_create_success);
   });
 });

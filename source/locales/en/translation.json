@@ -1,0 +1,9 @@
+{
+  "blank": "cannot be blank",
+  "username_size": "must have min 4 and max 32 characters",
+  "not_valid": "is not valid",
+  "password_size": "must be at least 6 characters",
+  "password_chars": "must have at least 1 uppercase, 1 lowercase letter and 1 number",
+  "been_taken": "has already been taken",
+  "user_created": "User created"
+}
