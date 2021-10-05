@@ -32,9 +32,23 @@ router.post(
       });
       return res.status(400).send({ validationErrors });
     }
-    await UserService.save(req.body);
-    return res.send({ message: req.t('user_created') });
+    try {
+      await UserService.save(req.body);
+      return res.send({ message: req.t('user_created') });
+    } catch (err) {
+      return res.status(502).send({ message: req.t(err.message) });
+    }
   }
 );
+
+router.post('/api/v1/users/token/:token', async (req, res) => {
+  const token = req.params.token;
+  try {
+    await UserService.activate(token);
+    return res.send({ message: req.t('account_activation_success') });
+  } catch (err) {
+    return res.status(400).send({ message: req.t(err.message) });
+  }
+});
 
 module.exports = router;

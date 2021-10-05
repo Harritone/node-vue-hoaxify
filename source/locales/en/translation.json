@@ -5,5 +5,8 @@
   "password_size": "must be at least 6 characters",
   "password_chars": "must have at least 1 uppercase, 1 lowercase letter and 1 number",
   "been_taken": "has already been taken",
-  "user_created": "User created"
+  "user_created": "User created",
+  "email_failure": "Email Failure",
+  "account_activation_failure": "This account is either active or the token is invalid",
+  "account_activation_success": "Account activated"
 }
