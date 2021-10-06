@@ -8,5 +8,6 @@
   "user_created": "Пользователь создан",
   "email_failure": "Не удалось отправить письмо.",
   "account_activation_failure": "Этот аккаунт активитрован или токен некорректный",
-  "account_activation_success": "Аккаунт активитрован"
+  "account_activation_success": "Аккаунт активитрован",
+  "validation_failure": "Ошибка валидации"
 }

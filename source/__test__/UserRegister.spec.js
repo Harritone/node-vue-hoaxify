@@ -3,7 +3,6 @@ const app = require('../src/app');
 const User = require('../src/user/User');
 const sequelize = require('../src/config/database');
 const SMTPServer = require('smtp-server').SMTPServer;
-const { agent } = require('superagent');
 
 let lastMail, server;
 let simulateSmtpFailure = false;
@@ -233,6 +232,16 @@ describe('User Registration', () => {
     const users = await User.findAll();
     expect(users.length).toBe(0);
   });
+
+  it('returns validation failure message in error response body when validation failes', async () => {
+    const response = await postUser({
+      username: null,
+      email: validUser.email,
+      password: validUser.password,
+    });
+
+    expect(response.body.message).toBe('Validation Failure');
+  });
 });
 
 describe('Internationalization', () => {
@@ -244,6 +253,7 @@ describe('Internationalization', () => {
   const been_taken = 'уже занят';
   const user_create_success = 'Пользователь создан';
   const email_failure = 'Не удалось отправить письмо.';
+  const validation_failure = 'Ошибка валидации';
 
   it.each`
     field         | value              | message
@@ -295,6 +305,19 @@ describe('Internationalization', () => {
     simulateSmtpFailure = true;
     const response = await postUser({ ...validUser }, { language: 'ru' });
     expect(response.body.message).toBe(email_failure);
+  });
+
+  it(`returns ${validation_failure} message when sending email fails and language is Russian`, async () => {
+    const response = await postUser(
+      {
+        username: null,
+        email: validUser.email,
+        password: validUser.password,
+      },
+      { language: 'ru' }
+    );
+
+    expect(response.body.message).toBe(validation_failure);
   });
 });
 
@@ -364,4 +387,39 @@ describe('Account activation', () => {
       expect(response.body.message).toBe(message);
     }
   );
+});
+
+describe('Error Model', () => {
+  it('returns path, timestamp, message and validationErrors in response when falidation failure', async () => {
+    const response = await postUser({ ...validUser, username: null });
+    const body = response.body;
+    expect(Object.keys(body)).toEqual(['path', 'timestamp', 'message', 'validationErrors']);
+  });
+
+  it('returns path, timestamp and message in  response when request fails other than validation errors', async () => {
+    const token = 'this-token-does-not-fit';
+
+    const response = await request(app).post(`/api/v1/users/token/${token}`).send();
+    const body = response.body;
+    expect(Object.keys(body)).toEqual(['path', 'timestamp', 'message']);
+  });
+
+  it('returns path in error body', async () => {
+    const token = 'this-token-does-not-fit';
+    const path = `/api/v1/users/token/${token}`;
+    const response = await request(app).post(path).send();
+    const body = response.body;
+    expect(body.path).toEqual(path);
+  });
+
+  it('returns timestamp in miliseconds within 5 seconds value in error body', async () => {
+    const timeNow = new Date().getTime();
+    const fiveSecondsLater = timeNow + 5 * 1000;
+    const token = 'this-token-does-not-fit';
+    const path = `/api/v1/users/token/${token}`;
+    const response = await request(app).post(path).send();
+    const body = response.body;
+    expect(body.timestamp).toBeGreaterThan(timeNow);
+    expect(body.timestamp).toBeLessThan(fiveSecondsLater);
+  });
 });
