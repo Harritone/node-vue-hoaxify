@@ -3,6 +3,7 @@ const UserService = require('./UserService');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
 const ValidationException = require('../error/ValidationException');
+const pagination = require('../middleware/pagination');
 
 router.post(
   '/api/v1/users',
@@ -27,8 +28,6 @@ router.post(
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      // const validationErrors = {};
-      // return res.status(400).send({ validationErrors });
       return next(new ValidationException(errors.array()));
     }
     try {
@@ -50,10 +49,9 @@ router.post('/api/v1/users/token/:token', async (req, res, next) => {
   }
 });
 
-router.get('/api/v1/users', async (req, res) => {
-  let page = req.query.page ? +req.query.page : 0;
-  if (page < 0) page = 0;
-  const users = await UserService.getUsers(page);
+router.get('/api/v1/users', pagination, async (req, res) => {
+  const { page, size } = req.pagination;
+  const users = await UserService.getUsers(page, size);
   res.send(users);
 });
 

@@ -43,20 +43,19 @@ const activate = async (token) => {
   await user.save();
 };
 
-const getUsers = async (page = 0) => {
-  const pageSize = 10;
+const getUsers = async (page, size) => {
   const usersWithCounts = await User.findAndCountAll({
     where: { inactive: false },
     attributes: ['id', 'username', 'email'],
-    limit: pageSize,
-    offset: +page * pageSize,
+    limit: size,
+    offset: +page * size,
   });
 
   return {
     content: usersWithCounts.rows,
     page: +page,
-    size: 10,
-    totalPages: Math.ceil(usersWithCounts.count / pageSize),
+    size,
+    totalPages: Math.ceil(usersWithCounts.count / size),
   };
 };
 
