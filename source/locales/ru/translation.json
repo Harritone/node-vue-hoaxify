@@ -9,5 +9,6 @@
   "email_failure": "Не удалось отправить письмо.",
   "account_activation_failure": "Этот аккаунт активитрован или токен некорректный",
   "account_activation_success": "Аккаунт активитрован",
-  "validation_failure": "Ошибка валидации"
+  "validation_failure": "Ошибка валидации",
+  "user_not_found": "Пользователь не найден"
 }

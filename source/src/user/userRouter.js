@@ -55,4 +55,13 @@ router.get('/api/v1/users', pagination, async (req, res) => {
   res.send(users);
 });
 
+router.get('/api/v1/users/:id', async (req, res, next) => {
+  try {
+    const user = await UserService.getUser(req.params.id);
+    res.send(user);
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;
