@@ -10,5 +10,7 @@
   "account_activation_failure": "Этот аккаунт активитрован или токен некорректный",
   "account_activation_success": "Аккаунт активитрован",
   "validation_failure": "Ошибка валидации",
-  "user_not_found": "Пользователь не найден"
+  "user_not_found": "Пользователь не найден",
+  "authentication_failure": "Не верные данные",
+  "inactive_account_failure": "Аккаунт не активирован"
 }
