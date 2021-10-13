@@ -5,7 +5,6 @@ const sequelize = require('../src/config/database');
 const bcrypt = require('bcrypt');
 const en = require('../locales/en/translation.json');
 const ru = require('../locales/ru/translation.json');
-const expectExport = require('expect');
 
 beforeAll(async () => {
   await sequelize.sync();
@@ -21,9 +20,6 @@ const putUser = async (id = 5, body = null, options = {}) => {
   if (options.auth) {
     const { email, password } = options.auth;
     agent.auth(email, password);
-    // const merged = `${email}:${password}`;
-    // const base64 = Buffer.from(merged).toString('base64');
-    // agent.set('Authorization', `Basic ${base64}`);
   }
   return await agent.send(body);
 };
@@ -44,7 +40,7 @@ const addUser = async (user = { ...activeUser }) => {
 describe('User Update', () => {
   it('returns forbidden when request sent without basic authorization', async () => {
     const response = await putUser();
-    expectExport(response.status).toBe(403);
+    expect(response.status).toBe(403);
   });
 
   it.each`
@@ -92,5 +88,24 @@ describe('User Update', () => {
       auth: { email: 'user1@mail.com', password: 'P4ssword' },
     });
     expect(response.status).toBe(403);
+  });
+
+  it('returns 200 ok when valid update request sent from authorized user', async () => {
+    const savedUser = await addUser();
+    const validUpdate = { username: 'user1-updated' };
+    const response = await putUser(savedUser.id, validUpdate, {
+      auth: { email: savedUser.email, password: 'P4ssword' },
+    });
+    expect(response.status).toBe(200);
+  });
+
+  it('updates username in db when valid update request sent from authorized user', async () => {
+    const savedUser = await addUser();
+    const validUpdate = { username: 'user1-updated' };
+    await putUser(savedUser.id, validUpdate, {
+      auth: { email: savedUser.email, password: 'P4ssword' },
+    });
+    const inDBUser = await User.findOne({ where: { id: savedUser.id } });
+    expect(inDBUser.username).toBe(validUpdate.username);
   });
 });

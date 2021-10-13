@@ -5,6 +5,7 @@ const { check, validationResult } = require('express-validator');
 const ValidationException = require('../error/ValidationException');
 const pagination = require('../middleware/pagination');
 const ForbiddenException = require('../error/ForbiddenException');
+const basicAuthentication = require('../middleware/basicAuthentication');
 
 router.post(
   '/api/v1/users',
@@ -70,8 +71,15 @@ router.get('/api/v1/users/:id', async (req, res, next) => {
   }
 });
 
-router.put('/api/v1/users/:is', () => {
-  throw new ForbiddenException('unauthorized_user_update');
+router.put('/api/v1/users/:id', basicAuthentication, async (req, res, next) => {
+  const authenticatedUser = req.authenticatedUser;
+
+  // eslint-disable-next-line eqeqeq
+  if (!authenticatedUser || authenticatedUser.id != req.params.id) {
+    return next(new ForbiddenException('unauthorized_user_update'));
+  }
+  await UserService.updateUser(req.params.id, req.body);
+  return res.send();
 });
 
 module.exports = router;
