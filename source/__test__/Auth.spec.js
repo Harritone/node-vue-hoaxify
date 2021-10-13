@@ -3,6 +3,8 @@ const app = require('../src/app');
 const User = require('../src/user/User');
 const sequelize = require('../src/config/database');
 const bcrypt = require('bcrypt');
+const en = require('../locales/en/translation.json');
+const ru = require('../locales/ru/translation.json');
 
 beforeAll(async () => {
   await sequelize.sync();
@@ -59,8 +61,8 @@ describe('Authentication', () => {
 
   it.each`
     language | message
-    ${'ru'}  | ${'Не верные данные'}
-    ${'en'}  | ${'Incorrect credentials'}
+    ${'ru'}  | ${ru.authentication_failure}
+    ${'en'}  | ${en.authentication_failure}
   `('returns $message when authentication fails and language is set to $lanaguage', async ({ language, message }) => {
     const response = await postAuthentication(
       { email: 'user1@mail.com', password: 'P4ssword' },
@@ -93,8 +95,8 @@ describe('Authentication', () => {
 
   it.each`
     language | message
-    ${'ru'}  | ${'Аккаунт не активирован'}
-    ${'en'}  | ${'Account is inactive'}
+    ${'ru'}  | ${ru.inactive_account_failure}
+    ${'en'}  | ${en.inactive_account_failure}
   `(
     'returns $message when authentication fails for inactive account and language is set to $lanaguage',
     async ({ language, message }) => {
@@ -108,13 +110,11 @@ describe('Authentication', () => {
   );
 
   it('returns 401 when email is not valid', async () => {
-    // await addUser({ ...activeUser, inactive: true });
     const response = await postAuthentication({ password: 'P4ssword' });
     expect(response.status).toBe(401);
   });
 
   it('returns 401 when password is not valid', async () => {
-    // await addUser({ ...activeUser, inactive: true });
     const response = await postAuthentication({ email: 'user1@mail.com' });
     expect(response.status).toBe(401);
   });
