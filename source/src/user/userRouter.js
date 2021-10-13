@@ -4,6 +4,7 @@ const router = express.Router();
 const { check, validationResult } = require('express-validator');
 const ValidationException = require('../error/ValidationException');
 const pagination = require('../middleware/pagination');
+const ForbiddenException = require('../error/ForbiddenException');
 
 router.post(
   '/api/v1/users',
@@ -67,6 +68,10 @@ router.get('/api/v1/users/:id', async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+});
+
+router.put('/api/v1/users/:is', () => {
+  throw new ForbiddenException('unauthorized_user_update');
 });
 
 module.exports = router;
