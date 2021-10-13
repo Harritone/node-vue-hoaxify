@@ -15,7 +15,12 @@ router.post(
     .isEmail()
     .withMessage('not_valid')
     .bail()
-    .custom(UserService.findByEmail),
+    .custom(async (email) => {
+      const user = await UserService.findByEmail(email);
+      if (user) {
+        throw new Error('been_taken');
+      }
+    }),
   check('password')
     .notEmpty()
     .withMessage('blank')

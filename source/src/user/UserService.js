@@ -28,10 +28,7 @@ const save = async (body) => {
 };
 
 const findByEmail = async (email) => {
-  const user = await User.findOne({ where: { email: email } });
-  if (user) {
-    throw new Error('been_taken');
-  }
+  return await User.findOne({ where: { email: email } });
 };
 
 const activate = async (token) => {
