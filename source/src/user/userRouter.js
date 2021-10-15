@@ -6,6 +6,7 @@ const ValidationException = require('../error/ValidationException');
 const pagination = require('../middleware/pagination');
 const ForbiddenException = require('../error/ForbiddenException');
 const basicAuthentication = require('../middleware/basicAuthentication');
+const TokenAuthentication = require('../middleware/TokenAuthentication');
 
 router.post(
   '/api/v1/users',
@@ -72,7 +73,7 @@ router.get('/api/v1/users/:id', async (req, res, next) => {
   }
 });
 
-router.put('/api/v1/users/:id', basicAuthentication, async (req, res, next) => {
+router.put('/api/v1/users/:id', TokenAuthentication, async (req, res, next) => {
   const authenticatedUser = req.authenticatedUser;
 
   // eslint-disable-next-line eqeqeq

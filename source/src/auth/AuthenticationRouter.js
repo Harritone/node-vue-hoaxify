@@ -17,7 +17,6 @@ router.post('/api/v1/auth', check('email').isEmail(), async (req, res, next) => 
   if (!match) return next(new AuthenticationException());
   if (user.inactive) return next(new ForbiddenException());
   const token = TokenServise.createToken(user);
-  console.log(token);
   res.send({
     id: user.id,
     username: user.username,
