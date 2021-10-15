@@ -5,7 +5,6 @@ const { check, validationResult } = require('express-validator');
 const ValidationException = require('../error/ValidationException');
 const pagination = require('../middleware/pagination');
 const ForbiddenException = require('../error/ForbiddenException');
-const basicAuthentication = require('../middleware/basicAuthentication');
 const TokenAuthentication = require('../middleware/TokenAuthentication');
 
 router.post(
@@ -57,7 +56,7 @@ router.post('/api/v1/users/token/:token', async (req, res, next) => {
   }
 });
 
-router.get('/api/v1/users', pagination, basicAuthentication, async (req, res) => {
+router.get('/api/v1/users', pagination, TokenAuthentication, async (req, res) => {
   const authenticatedUser = req.authenticatedUser;
   const { page, size } = req.pagination;
   const users = await UserService.getUsers(page, size, authenticatedUser);
