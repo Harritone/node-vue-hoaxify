@@ -5,6 +5,7 @@ const sequelize = require('../src/config/database');
 const bcrypt = require('bcrypt');
 const en = require('../locales/en/translation.json');
 const ru = require('../locales/ru/translation.json');
+const Token = require('../src/auth/Token');
 
 beforeAll(async () => {
   await sequelize.sync();
@@ -21,6 +22,11 @@ const activeUser = {
   inactive: false,
 };
 
+const postLogout = async (options = {}) => {
+  const agent = request(app).post('/api/v1/logout');
+  if (options.token) agent.set('Authorization', `Bearer ${options.token}`);
+  return await agent.send();
+};
 const addUser = async (user = { ...activeUser }) => {
   const hash = await bcrypt.hash(user.password, 10);
   user.password = hash;
@@ -128,5 +134,21 @@ describe('Authentication', () => {
     await addUser();
     const response = await postAuthentication({ email: 'user1@mail.com', password: 'P4ssword' });
     expect(response.body.token).not.tobeUndefined;
+  });
+});
+
+describe('Logout', () => {
+  it('returns 200 ok when unauthorized request send for logout', async () => {
+    const response = await postLogout();
+    expect(response.status).toBe(200);
+  });
+
+  it('removes token from database', async () => {
+    await addUser();
+    const response = await postAuthentication({ email: 'user1@mail.com', password: 'P4ssword' });
+    const token = response.body.token;
+    await postLogout({ token: token });
+    const storedToken = await Token.findOne({ where: { token: token } });
+    expect(storedToken).toBeNull();
   });
 });

@@ -1,21 +1,17 @@
 const User = require('./User');
 const bcrypt = require('bcrypt');
-const crypto = require('crypto');
 const Sequelize = require('sequelize');
 const emailService = require('../email/emailService');
 const sequelize = require('../config/database');
 const EmailException = require('../email/EmailException');
 const InvalidTokenEception = require('./InvalidTokenException');
 const UserNotFoundException = require('../error/UserNotFoundException');
-
-const generateToken = (length) => {
-  return crypto.randomBytes(length).toString('hex').substring(0, length);
-};
+const { randomString } = require('../shared/generator');
 
 const save = async (body) => {
   const { username, email, password } = body;
   const hash = await bcrypt.hash(password, 10);
-  const user = { username, email, password: hash, activationToken: generateToken(16) };
+  const user = { username, email, password: hash, activationToken: randomString(16) };
   // const user = Object.assign({}, req.body, { password: hash });
   const transaction = await sequelize.transaction();
   await User.create(user, { transaction });
@@ -77,4 +73,8 @@ const updateUser = async (id, updatedBody) => {
   await user.save();
 };
 
-module.exports = { save, findByEmail, activate, getUsers, getUser, updateUser };
+const deleteUser = async (id) => {
+  await User.destroy({ where: { id: id } });
+};
+
+module.exports = { save, findByEmail, activate, getUsers, getUser, updateUser, deleteUser };

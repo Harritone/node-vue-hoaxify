@@ -13,5 +13,6 @@
   "user_not_found": "Пользователь не найден",
   "authentication_failure": "Не верные данные",
   "inactive_account_failure": "Аккаунт не активирован",
-  "unauthorized_user_update": "Вы не авторизованы для внесения изменений пользовтеля"
+  "unauthorized_user_update": "Вы не авторизованы для внесения изменений пользовтеля",
+  "unauthorized_user_delete": "Вы не авторизованы для удаления пользовтеля"
 }
