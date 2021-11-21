@@ -20,8 +20,6 @@ const verify = async (token) => {
 };
 
 const removeToken = async (token) => {
-  // const tokenInDB = await Token.findOne({ where: { token: token } });
-  // await tokenInDB.destroy();
   await Token.destroy({ where: { token: token } });
 };
 

@@ -6,6 +6,7 @@ const ValidationException = require('../error/ValidationException');
 const pagination = require('../middleware/pagination');
 const ForbiddenException = require('../error/ForbiddenException');
 const TokenAuthentication = require('../middleware/TokenAuthentication');
+const TokenService = require('../auth/TokenService');
 
 router.post(
   '/api/v1/users',
